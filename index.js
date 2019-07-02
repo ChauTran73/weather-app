@@ -34,15 +34,12 @@ function getWeather(lat,long){
         var condition = data.currently.summary;
         $("#condition").html(condition);
         var icon = data.currently.icon;
-        
         var skycons = new Skycons({"color": "black"});
         skycons.add(document.getElementById("icon"), icon);
         skycons.play();
         var temp = data.currently.temperature;
         var tempCelsius = Math.round(temp);
         var tempFah = Math.round(temp*9/5+32);
-       
-       
        var celsius = true;
        $("#temperature").html(tempCelsius + ' °C');
       $("#temperature").click(function(){
