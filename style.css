@@ -1,0 +1,30 @@
+@import url('https://fonts.googleapis.com/css?family=Ubuntu&display=swap');
+
+  * {
+    box-sizing: border-box;
+  }
+  body, html{
+    font-family: 'Ubuntu', sans-serif;
+    background-image: url('https://cdn.pixabay.com/photo/2019/05/19/23/47/clouds-4215608_1280.jpg');
+    height: 100%;
+    color: darkgoldenrod;
+    font-size: 15px;
+  }
+  .container{
+    display: block;
+    position: relative;
+    margin: 40px auto;
+    height: 400px;
+    width: 400px;
+    padding: 20px;
+    text-align: center;
+    border: 1px solid #6091DD;
+    border-radius: 5px;
+    box-shadow: 5px 7px 2px #6091DD;
+  }
+h2{
+    color: black;
+  }
+ 
+  
+  
