@@ -1,8 +1,7 @@
 'use strict';
-
 const GOOGLE_KEY ='AIzaSyCuHlSt7CFmuGXVSUTFcJ1iaRaVgOXM7tw';
 const DARKSKY_KEY = '835bf47b005187b101cb02bccea176a5';
-const googlemap_url = 'https://maps.googleapis.com/maps/api/geocode/json?latlng=';
+const googlemap_url = 'https://maps.googleapis.com/maps/api/geocode/json?';
 const darksky_url = 'https://cors-anywhere.herokuapp.com/https://api.darksky.net/forecast/'
 
 function formatQueryParams(params) {
@@ -17,8 +16,6 @@ function getWeather(lat,long){
   };
   const queryString = formatQueryParams(params)
   const weather_url = darksky_url + DARKSKY_KEY + '/' + lat + ','+ long + '?' + queryString;
-
-  console.log(weather_url);
   const options = {
     method: 'GET'
   };
@@ -55,26 +52,58 @@ function getWeather(lat,long){
     }
   )})
   .catch(function(err) {
-    console.log('Fetch Error :-S', err);
+    console.log('Fetch Weather Error :-S', err);
   })
   
 }
-function getLocation(){
+function getCurrentLocation(){
     navigator.geolocation.getCurrentPosition(function(position){
         var lng = position.coords.longitude;
         var lat = position.coords.latitude;
-        const url = googlemap_url + `${lat}` + ',' + `${lng}` + '&key=' + GOOGLE_KEY;
+        const params = 
+        {
+            latlng: [lat,lng]
+        }
+        const queryString = formatQueryParams(params)
+        const url = googlemap_url + queryString + '&key=' + GOOGLE_KEY;
         fetch(url)
         .then(response => response.json())
         .then(responseJson => $("#location").html(responseJson.results[5].formatted_address))
         .catch(function(err) {
-            console.log('Fetch Error :-S', err);
+            console.log('Fetch Location Error :-S', err);
           });
         getWeather(lat,lng);
     });
 }
 
-function init(){
-  getLocation();
+function getSearchLocation(){
+    $("#search").on("click",function(){
+        var searchLocation = $("#searchTerm").val();
+        const params = 
+        {
+            address: searchLocation
+        }
+        const queryString = formatQueryParams(params);
+        const url = googlemap_url + queryString + '&key=' + GOOGLE_KEY;
+        fetch(url)
+        .then(response => response.json())
+        .then(function(responseJson){
+            $("#location").html(responseJson.results[0].formatted_address);
+            const lat = responseJson.results[0].geometry.location.lat;
+          const long = responseJson.results[0].geometry.location.lng;
+          getWeather(lat,long);
+        })
+        .catch(function(err) {
+            console.log('Fetch Location Error :-S', err);
+          });
+          
+          
+    })
 }
+
+function init(){
+  getCurrentLocation();
+  getSearchLocation();
+}
+
 $(init());

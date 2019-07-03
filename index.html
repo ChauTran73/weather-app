@@ -11,9 +11,10 @@
 <body>
     <div class="container">
         <h1>What's the weather?</h1>
+        <input type="text" placeholder="Brooklyn,USA" id="searchTerm"><button id="search" >Search for a city...</button>
         <h2 id = "location" class = "text-center">Location: </h2>
         <h2 id= "condition" class="text-center"></h2><canvas id="icon" width="100" height="100"></canvas>
-        <h2 class="text-center" style="cursor: pointer">Temperature: <span id="temperature" class="toggle"></span></h2>
+        <h2 id="temp" style="cursor: pointer">Temperature: <span id="temperature" class="toggle"></span></h2>
         
    </div>
    <script async defer type="text/javascript" src="http://maps.googleapis.com/maps/api/js?sensor=false"></script> 
