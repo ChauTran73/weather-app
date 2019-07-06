@@ -10,6 +10,42 @@ function formatQueryParams(params) {
     return queryItems.join('&');
   }
 
+  
+  function generateChart(hightempdata,lowtempdata,hourdata){
+    window.chartColors = {
+        red: 'rgb(255, 99, 132)',
+        orange: 'rgb(255, 159, 64)',
+        yellow: 'rgb(255, 205, 86)',
+        green: 'rgb(75, 192, 192)',
+        blue: 'rgb(54, 162, 235)',
+        purple: 'rgb(153, 102, 255)',
+        grey: 'rgb(231,233,237)'
+      };
+    var ctx = document.getElementById("myChart").getContext("2d");
+    var myLineChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: hourdata,
+            datasets: [
+            {
+              label: 'High temp',
+              borderColor: window.chartColors.blue,
+              borderWidth: 2,
+              fill: false,
+              data: hightempdata
+            },
+            {
+                label: 'Low temp',
+                borderColor: window.chartColors.red,
+                borderWidth: 2,
+                fill: true,
+                data: lowtempdata
+              },
+        ]
+        },
+        
+    })
+}
 function getWeather(lat,long){
   const params = {
     units: 'si',
@@ -27,14 +63,15 @@ function getWeather(lat,long){
           response.status);
         return;
       }
-      response.json().then(function(data) {
-        var condition = data.currently.summary;
+      response.json().then(function(responseJson) {
+        var condition = responseJson.currently.summary;
         $("#condition").html(condition);
-        var icon = data.currently.icon;
+        var icon = responseJson.currently.icon;
         var skycons = new Skycons({"color": "black"});
+        console.log(responseJson)
         skycons.add(document.getElementById("icon"), icon);
         skycons.play();
-        var temp = data.currently.temperature;
+        var temp = responseJson.currently.temperature;
         var tempCelsius = Math.round(temp);
         var tempFah = Math.round(temp*9/5+32);
        var celsius = true;
@@ -47,7 +84,12 @@ function getWeather(lat,long){
       $("#temperature").html(tempFah + ' °F');
     }
     celsius = !celsius;
+   
       });
+      var dewPoint = responseJson.currently.dewPoint;
+      var humidity = responseJson.currently.humidity;
+      var windSpeed = responseJson.currently.windSpeed;
+      $("div .subinfo").html( "Humidity: "+ Math.round(humidity*100) + "%" + "  " + "Wind Speed: "+ windSpeed + "m/s")
 
     }
   )})
@@ -77,7 +119,8 @@ function getCurrentLocation(){
 }
 
 function getSearchLocation(){
-    $("#search").on("click",function(){
+    $("form").on("click", "#search",function(e){
+        e.preventDefault();
         var searchLocation = $("#searchTerm").val();
         const params = 
         {
@@ -100,6 +143,8 @@ function getSearchLocation(){
           
     })
 }
+
+
 
 function init(){
   getCurrentLocation();
