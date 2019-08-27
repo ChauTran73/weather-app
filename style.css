@@ -13,22 +13,25 @@
     font-size: 15px;
     font-weight: 450;
   }
-  
+  .hidden {
+    display: none;
+  }
   .container{
     display: block;
     position: relative;
     margin: 40px auto;
     height: 500px;
     width: 500px;
-    padding: 20px;
+    padding: 20px 5px;
     text-align: center;
     border: 1px solid #6091DD;
     border-radius: 5px;
     box-shadow: 5px 7px 2px #6091DD;
   }
-h2{
+h2, span{
     color: black;
   }
+ 
 .subinfo{
     color: blue;
 }
@@ -86,6 +89,9 @@ span.toggle{
   
   form > .button:hover {
     background-color: rgba(0, 150, 136, 0.8);
+  }
+  footer{
+    text-align: center
   }
   
   

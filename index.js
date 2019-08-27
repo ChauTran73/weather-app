@@ -2,51 +2,17 @@
 const GOOGLE_KEY ='AIzaSyCuHlSt7CFmuGXVSUTFcJ1iaRaVgOXM7tw';
 const DARKSKY_KEY = '835bf47b005187b101cb02bccea176a5';
 const googlemap_url = 'https://maps.googleapis.com/maps/api/geocode/json?';
-const darksky_url = 'https://cors-anywhere.herokuapp.com/https://api.darksky.net/forecast/'
+const darksky_url = 'https://cors-anywhere.herokuapp.com/https://api.darksky.net/forecast/';
+
 
 function formatQueryParams(params) {
     const queryItems = Object.keys(params)
       .map(key => `${key}=${params[key]}`)
     return queryItems.join('&');
-  }
-
-  
-  function generateChart(hightempdata,lowtempdata,hourdata){
-    window.chartColors = {
-        red: 'rgb(255, 99, 132)',
-        orange: 'rgb(255, 159, 64)',
-        yellow: 'rgb(255, 205, 86)',
-        green: 'rgb(75, 192, 192)',
-        blue: 'rgb(54, 162, 235)',
-        purple: 'rgb(153, 102, 255)',
-        grey: 'rgb(231,233,237)'
-      };
-    var ctx = document.getElementById("myChart").getContext("2d");
-    var myLineChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: hourdata,
-            datasets: [
-            {
-              label: 'High temp',
-              borderColor: window.chartColors.blue,
-              borderWidth: 2,
-              fill: false,
-              data: hightempdata
-            },
-            {
-                label: 'Low temp',
-                borderColor: window.chartColors.red,
-                borderWidth: 2,
-                fill: true,
-                data: lowtempdata
-              },
-        ]
-        },
-        
-    })
 }
-function getWeather(lat,long){
+
+
+function getWeatherData(lat,long){
   const params = {
     units: 'si',
   };
@@ -56,48 +22,49 @@ function getWeather(lat,long){
     method: 'GET'
   };
   fetch(weather_url,options)
-  .then(
-    function(response) {
-      if (response.status !== 200) {
-        console.log('Looks like there was a problem. Status Code: ' +
-          response.status);
-        return;
-      }
-      response.json().then(function(responseJson) {
-        var condition = responseJson.currently.summary;
-        $("#condition").html(condition);
+  .then(response => {
+    if (response.ok) {
+      return response.json();
+    }
+    throw new Error(response.statusText);
+  })
+  .then(responseJson => {displayWeather(responseJson); disPlayTime(responseJson)})
+    .catch(err => {
+      $('#js-error-message').text(`Something went wrong: ${err.message}`);
+    });
+ }
+
+ function displayWeather(responseJson){
+    $('#results').empty();
+    $('#results').append(
+      `<div>
+      <h2>${disPlayTime(responseJson)}</h2>
+      <h2>${responseJson.currently.summary}</h2>
+      <canvas id="icon" width="100" height="100"></canvas>
+      <h2 id="temp">Temperature: ${Math.round(responseJson.currently.temperature*9/5+32)} °F </h2>
+      <span>Humidity: ${responseJson.currently.humidity*100} %</span>
+      <span>Windspeed: ${responseJson.currently.windSpeed} m/h</span>
+      </div>`
+      
+    )
         var icon = responseJson.currently.icon;
         var skycons = new Skycons({"color": "black"});
-        console.log(responseJson)
         skycons.add(document.getElementById("icon"), icon);
         skycons.play();
-        var temp = responseJson.currently.temperature;
-        var tempCelsius = Math.round(temp);
-        var tempFah = Math.round(temp*9/5+32);
-       var celsius = true;
-       $("#temperature").html(tempCelsius + ' °C');
-      $("#temperature").click(function(){
-      if (celsius) {
-    	$(".toggle").html(tempCelsius + ' °C');
-    } 
-      else {
-      $("#temperature").html(tempFah + ' °F');
-    }
-    celsius = !celsius;
+      
+       
+     
+       $("#results").removeClass("hidden");
    
-      });
-      var dewPoint = responseJson.currently.dewPoint;
-      var humidity = responseJson.currently.humidity;
-      var windSpeed = responseJson.currently.windSpeed;
-      $("div .subinfo").html( "Humidity: "+ Math.round(humidity*100) + "%" + "  " + "Wind Speed: "+ windSpeed + "m/s")
+  }
+  function disPlayTime(responseJson){
+    
+    var date = moment.unix(responseJson.currently.time).format('YYYY-MM-DD HH:mm')
+    var b = moment(date).tz(responseJson.timezone).format('dddd, MMMM Do, YYYY h:mm a');
+    
+    return b;
 
-    }
-  )})
-  .catch(function(err) {
-    console.log('Fetch Weather Error :-S', err);
-  })
-  
-}
+  }
 function getCurrentLocation(){
     navigator.geolocation.getCurrentPosition(function(position){
         var lng = position.coords.longitude;
@@ -110,11 +77,11 @@ function getCurrentLocation(){
         const url = googlemap_url + queryString + '&key=' + GOOGLE_KEY;
         fetch(url)
         .then(response => response.json())
-        .then(responseJson => $("#location").html(responseJson.results[5].formatted_address))
+        .then(responseJson => $("#location").html(responseJson.results[5].formatted_address))//displayLocation function
         .catch(function(err) {
             console.log('Fetch Location Error :-S', err);
           });
-        getWeather(lat,lng);
+        getWeatherData(lat,lng);
     });
 }
 
@@ -125,16 +92,17 @@ function getSearchLocation(){
         const params = 
         {
             address: searchLocation
-        }
+        } 
         const queryString = formatQueryParams(params);
         const url = googlemap_url + queryString + '&key=' + GOOGLE_KEY;
+        console.log("searchurl:", url)
         fetch(url)
         .then(response => response.json())
         .then(function(responseJson){
             $("#location").html(responseJson.results[0].formatted_address);
-            const lat = responseJson.results[0].geometry.location.lat;
+          const lat = responseJson.results[0].geometry.location.lat;
           const long = responseJson.results[0].geometry.location.lng;
-          getWeather(lat,long);
+          getWeatherData(lat,long);
         })
         .catch(function(err) {
             console.log('Fetch Location Error :-S', err);
@@ -149,6 +117,7 @@ function getSearchLocation(){
 function init(){
   getCurrentLocation();
   getSearchLocation();
+  
 }
 
 $(init());
