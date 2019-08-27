@@ -11,7 +11,6 @@ function formatQueryParams(params) {
     return queryItems.join('&');
 }
 
-
 function getWeatherData(lat,long){
   const params = {
     units: 'si',
