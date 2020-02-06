@@ -1,6 +1,6 @@
 # TELL-ME-THE-WEATHER.IO
 
-A simple weather app that summarizes your local weather and let you search for any other location's weather
+A simple weather app that summarizes your local weather and lets you search for any other location's weather
 
 ## Screenshots:
 Landing/Main Page:
