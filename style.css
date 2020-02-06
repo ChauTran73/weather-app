@@ -36,8 +36,12 @@ h2, span{
 .subinfo{
     color: blue;
 }
-span.toggle{
-    text-shadow: 2px 2px #6091DD;
+.toggle{
+    cursor: pointer;
+    border: 2px black solid;
+    padding: 4px;
+    background-color: rgb(214, 189, 125);
+    box-shadow: 0 3px 3px darkgoldenrod;
 }
   form {
     display: inline-block;
